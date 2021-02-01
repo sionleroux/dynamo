@@ -45,17 +45,26 @@ func (g *Game) Update() error {
 		return errors.New("game quit by player")
 	}
 
+	// Movement controls
 	if inpututil.IsKeyJustPressed(ebiten.KeyS) {
-		g.Player.y++
+		if g.Player.y+1 <= float64(g.Height-1) {
+			g.Player.y++
+		}
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyW) {
-		g.Player.y--
+		if g.Player.y-1 >= 0 {
+			g.Player.y--
+		}
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyA) {
-		g.Player.x--
+		if g.Player.x-1 >= 0 {
+			g.Player.x--
+		}
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyD) {
-		g.Player.x++
+		if g.Player.x+1 <= float64(g.Width-1) {
+			g.Player.x++
+		}
 	}
 
 	return nil
@@ -67,7 +76,7 @@ type Player struct {
 	y float64
 }
 
-// Draw draws the game screen by one frame.
+// Draw draws the game screen by one frame
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(colorDark)
 	ebitenutil.DrawRect(screen, g.Player.x, g.Player.y, 1, 1, color.RGBA{199, 240, 216, 255})
