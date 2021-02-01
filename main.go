@@ -7,6 +7,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
 var (
@@ -23,6 +24,7 @@ func main() {
 	game := &Game{
 		Width:  gameWidth,
 		Height: gameHeight,
+		Player: &Player{},
 	}
 
 	if err := ebiten.RunGame(game); err != nil {
@@ -33,30 +35,42 @@ func main() {
 type Game struct {
 	Width  int
 	Height int
+	Player *Player
 }
 
 // Update updates a game by one tick. The given argument represents a screen image.
-//
-// Update updates only the game logic and Draw draws the screen.
-//
-// In the first frame, it is ensured that Update is called at least once before Draw. You can use Update
-// to initialize the game state.
-//
-// After the first frame, Update might not be called or might be called once
-// or more for one frame. The frequency is determined by the current TPS (tick-per-second).
 func (g *Game) Update() error {
 	// Pressing Esc any time quits immediately
 	if ebiten.IsKeyPressed(ebiten.KeyEscape) {
 		return errors.New("game quit by player")
 	}
 
+	if inpututil.IsKeyJustPressed(ebiten.KeyS) {
+		g.Player.y++
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyW) {
+		g.Player.y--
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyA) {
+		g.Player.x--
+	}
+	if inpututil.IsKeyJustPressed(ebiten.KeyD) {
+		g.Player.x++
+	}
+
 	return nil
+}
+
+// Player is the pixel the player controlers
+type Player struct {
+	x float64
+	y float64
 }
 
 // Draw draws the game screen by one frame.
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(colorDark)
-	ebitenutil.DrawLine(screen, 0, 0, 47, 47, color.RGBA{199, 240, 216, 255})
+	ebitenutil.DrawRect(screen, g.Player.x, g.Player.y, 1, 1, color.RGBA{199, 240, 216, 255})
 }
 
 // Layout is hardcoded for now, may be made dynamic in future
