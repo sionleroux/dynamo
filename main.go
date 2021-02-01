@@ -25,7 +25,7 @@ func main() {
 	game := &Game{
 		Width:  gameWidth,
 		Height: gameHeight,
-		Player: &Player{},
+		Player: &Player{1, 1},
 	}
 
 	if err := ebiten.RunGame(game); err != nil {
