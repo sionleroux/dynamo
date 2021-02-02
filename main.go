@@ -4,15 +4,18 @@ import (
 	"errors"
 	"image/color"
 	"log"
+	"math/rand"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"gitlab.com/zaba505/maze"
 )
 
 var (
 	colorLight color.Color = color.RGBA{199, 240, 216, 255}
 	colorDark  color.Color = color.RGBA{67, 82, 61, 255}
+	mazeImage  *ebiten.Image
 )
 
 func main() {
@@ -21,6 +24,11 @@ func main() {
 	ebiten.SetCursorMode(ebiten.CursorModeHidden)
 	ebiten.SetWindowResizable(true)
 	gameWidth, gameHeight := 84, 48
+
+	source := rand.NewSource(1)
+	generator := maze.WithKruskal(source)
+	mymaze := generator.Generate(gameWidth/2-1, gameHeight/2-1)
+	mazeImage = ebiten.NewImageFromImage(maze.Gray(mymaze))
 
 	game := &Game{
 		Width:  gameWidth,
@@ -80,6 +88,7 @@ type Player struct {
 // Draw draws the game screen by one frame
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(colorDark)
+	screen.DrawImage(mazeImage, &ebiten.DrawImageOptions{})
 	ebitenutil.DrawRect(screen, g.Player.x, g.Player.y, 1, 1, color.RGBA{199, 240, 216, 255})
 }
 
