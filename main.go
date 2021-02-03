@@ -41,6 +41,7 @@ func main() {
 	}
 }
 
+// Game tracks global game states
 type Game struct {
 	Width  int
 	Height int
