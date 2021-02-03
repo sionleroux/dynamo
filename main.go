@@ -57,43 +57,43 @@ func (g *Game) Update() error {
 
 	// Movement controls
 	if inpututil.IsKeyJustPressed(ebiten.KeyS) {
-		if g.Player.y+1 <= float64(g.Height-1) {
-			g.Player.y++
+		if g.Player.Y+1 <= float64(g.Height-1) {
+			g.Player.Y++
 		}
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyW) {
-		if g.Player.y-1 >= 0 {
-			g.Player.y--
+		if g.Player.Y-1 >= 0 {
+			g.Player.Y--
 		}
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyA) {
-		if g.Player.x-1 >= 0 {
-			g.Player.x--
+		if g.Player.X-1 >= 0 {
+			g.Player.X--
 		}
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyD) {
-		if g.Player.x+1 <= float64(g.Width-1) {
-			g.Player.x++
+		if g.Player.X+1 <= float64(g.Width-1) {
+			g.Player.X++
 		}
 	}
 
 	return nil
 }
 
-// Player is the pixel the player controlers
-type Player struct {
-	x float64
-	y float64
-}
-
 // Draw draws the game screen by one frame
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(colorDark)
 	screen.DrawImage(mazeImage, &ebiten.DrawImageOptions{})
-	ebitenutil.DrawRect(screen, g.Player.x, g.Player.y, 1, 1, color.RGBA{199, 240, 216, 255})
+	ebitenutil.DrawRect(screen, g.Player.X, g.Player.Y, 1, 1, color.RGBA{199, 240, 216, 255})
 }
 
 // Layout is hardcoded for now, may be made dynamic in future
 func (g *Game) Layout(outsideWidth int, outsideHeight int) (screenWidth int, screenHeight int) {
 	return g.Width, g.Height
+}
+
+// Player is the pixel the player controlers
+type Player struct {
+	X float64
+	Y float64
 }
