@@ -1,4 +1,4 @@
-module github.com/sinisterstuf/nokia-game
+module github.com/sinisterstuf/dynamo
 
 go 1.15
 
