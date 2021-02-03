@@ -20,7 +20,7 @@ var (
 
 func main() {
 	ebiten.SetWindowSize(840, 480)
-	ebiten.SetWindowTitle("TODO: cool game name")
+	ebiten.SetWindowTitle("Dynamo")
 	ebiten.SetCursorMode(ebiten.CursorModeHidden)
 	ebiten.SetWindowResizable(true)
 	gameWidth, gameHeight := 84, 48
