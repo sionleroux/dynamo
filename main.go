@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"image"
 	"image/color"
 	"log"
 	"math/rand"
@@ -13,9 +14,12 @@ import (
 )
 
 var (
-	colorLight color.Color = color.RGBA{199, 240, 216, 255}
-	colorDark  color.Color = color.RGBA{67, 82, 61, 255}
-	mazeImage  *ebiten.Image
+	colorLight   color.Color   = color.RGBA{199, 240, 216, 255}
+	colorDark    color.Color   = color.RGBA{67, 82, 61, 255}
+	nokiaPalette color.Palette = color.Palette{
+		colorDark,
+		colorLight,
+	}
 )
 
 func main() {
@@ -28,12 +32,20 @@ func main() {
 	source := rand.NewSource(1)
 	generator := maze.WithKruskal(source)
 	mymaze := generator.Generate(gameWidth/2-1, gameHeight/2-1)
-	mazeImage = ebiten.NewImageFromImage(maze.Gray(mymaze))
+	grayMaze := maze.Gray(mymaze)
+	colorMaze := image.NewPaletted(grayMaze.Bounds(), nokiaPalette)
+	for k, v := range grayMaze.Pix {
+		if v == 255 {
+			colorMaze.Pix[k] = 1
+		}
+	}
+	mazeImage := ebiten.NewImageFromImage(colorMaze)
 
 	game := &Game{
 		Width:  gameWidth,
 		Height: gameHeight,
 		Player: &Player{1, 1},
+		Maze:   mazeImage,
 	}
 
 	if err := ebiten.RunGame(game); err != nil {
@@ -46,6 +58,7 @@ type Game struct {
 	Width  int
 	Height int
 	Player *Player
+	Maze   *ebiten.Image
 }
 
 // Update updates a game by one tick. The given argument represents a screen image.
@@ -83,7 +96,7 @@ func (g *Game) Update() error {
 // Draw draws the game screen by one frame
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(colorDark)
-	screen.DrawImage(mazeImage, &ebiten.DrawImageOptions{})
+	screen.DrawImage(g.Maze, &ebiten.DrawImageOptions{})
 	ebitenutil.DrawRect(screen, g.Player.X, g.Player.Y, 1, 1, color.RGBA{199, 240, 216, 255})
 }
 
