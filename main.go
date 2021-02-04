@@ -88,28 +88,28 @@ func (g *Game) Update() error {
 
 	// Movement controls
 	if inpututil.IsKeyJustPressed(ebiten.KeyS) {
+		g.Player.TorchOn = false
 		if g.Player.Y+1 <= g.Height-1 && g.Maze.At(g.Player.X, g.Player.Y+1) != nokiaPalette[0] {
 			g.Player.Y++
-			g.Player.TorchOn = false
 
 		}
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyW) && g.Maze.At(g.Player.X, g.Player.Y-1) != nokiaPalette[0] {
-		if g.Player.Y-1 >= 0 {
+	if inpututil.IsKeyJustPressed(ebiten.KeyW) {
+		g.Player.TorchOn = false
+		if g.Player.Y-1 >= 0 && g.Maze.At(g.Player.X, g.Player.Y-1) != nokiaPalette[0] {
 			g.Player.Y--
-			g.Player.TorchOn = false
 		}
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyA) && g.Maze.At(g.Player.X-1, g.Player.Y) != nokiaPalette[0] {
-		if g.Player.X-1 >= 0 {
+	if inpututil.IsKeyJustPressed(ebiten.KeyA) {
+		g.Player.TorchOn = false
+		if g.Player.X-1 >= 0 && g.Maze.At(g.Player.X-1, g.Player.Y) != nokiaPalette[0] {
 			g.Player.X--
-			g.Player.TorchOn = false
 		}
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyD) && g.Maze.At(g.Player.X+1, g.Player.Y) != nokiaPalette[0] {
-		if g.Player.X+1 <= g.Width-1 {
+	if inpututil.IsKeyJustPressed(ebiten.KeyD) {
+		g.Player.TorchOn = false
+		if g.Player.X+1 <= g.Width-1 && g.Maze.At(g.Player.X+1, g.Player.Y) != nokiaPalette[0] {
 			g.Player.X++
-			g.Player.TorchOn = false
 		}
 	}
 
