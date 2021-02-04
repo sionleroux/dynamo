@@ -131,7 +131,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 		screen.DrawImage(g.Maze, &ebiten.DrawImageOptions{})
 	}
 	playercolor := colorDark
-	if g.BlinkOn {
+	if g.BlinkOn || !g.Player.TorchOn {
 		playercolor = colorLight
 	}
 	ebitenutil.DrawRect(screen, g.Player.X, g.Player.Y, 1, 1, playercolor)
