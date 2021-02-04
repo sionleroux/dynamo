@@ -44,7 +44,7 @@ func main() {
 	game := &Game{
 		Width:  gameWidth,
 		Height: gameHeight,
-		Player: &Player{1, 1},
+		Player: &Player{1, 1, true},
 		Maze:   mazeImage,
 	}
 
@@ -90,13 +90,23 @@ func (g *Game) Update() error {
 		}
 	}
 
+	if inpututil.IsKeyJustPressed(ebiten.KeyE) {
+		if g.Player.TorchOn {
+			g.Player.TorchOn = false
+		} else {
+			g.Player.TorchOn = true
+		}
+	}
+
 	return nil
 }
 
 // Draw draws the game screen by one frame
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(colorDark)
-	screen.DrawImage(g.Maze, &ebiten.DrawImageOptions{})
+	if g.Player.TorchOn {
+		screen.DrawImage(g.Maze, &ebiten.DrawImageOptions{})
+	}
 	ebitenutil.DrawRect(screen, g.Player.X, g.Player.Y, 1, 1, color.RGBA{199, 240, 216, 255})
 }
 
@@ -107,6 +117,7 @@ func (g *Game) Layout(outsideWidth int, outsideHeight int) (screenWidth int, scr
 
 // Player is the pixel the player controlers
 type Player struct {
-	X float64
-	Y float64
+	X       float64
+	Y       float64
+	TorchOn bool
 }
