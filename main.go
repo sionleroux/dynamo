@@ -6,6 +6,7 @@ import (
 	"image/color"
 	"log"
 	"math/rand"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
@@ -42,11 +43,27 @@ func main() {
 	mazeImage := ebiten.NewImageFromImage(colorMaze)
 
 	game := &Game{
-		Width:  gameWidth,
-		Height: gameHeight,
-		Player: &Player{1, 1, true},
-		Maze:   mazeImage,
+		Width:   gameWidth,
+		Height:  gameHeight,
+		Player:  &Player{1, 1, true},
+		Maze:    mazeImage,
+		BlinkOn: true,
 	}
+
+	blinker := time.NewTicker(500 * time.Millisecond)
+
+	go func() {
+		for {
+			select {
+			case <-blinker.C:
+				if game.BlinkOn {
+					game.BlinkOn = false
+				} else {
+					game.BlinkOn = true
+				}
+			}
+		}
+	}()
 
 	if err := ebiten.RunGame(game); err != nil {
 		log.Fatal(err)
@@ -55,10 +72,11 @@ func main() {
 
 // Game tracks global game states
 type Game struct {
-	Width  int
-	Height int
-	Player *Player
-	Maze   *ebiten.Image
+	Width   int
+	Height  int
+	Player  *Player
+	Maze    *ebiten.Image
+	BlinkOn bool
 }
 
 // Update updates a game by one tick. The given argument represents a screen image.
@@ -73,6 +91,7 @@ func (g *Game) Update() error {
 		if g.Player.Y+1 <= float64(g.Height-1) {
 			g.Player.Y++
 			g.Player.TorchOn = false
+
 		}
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyW) {
@@ -111,7 +130,11 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	if g.Player.TorchOn {
 		screen.DrawImage(g.Maze, &ebiten.DrawImageOptions{})
 	}
-	ebitenutil.DrawRect(screen, g.Player.X, g.Player.Y, 1, 1, color.RGBA{199, 240, 216, 255})
+	playercolor := colorDark
+	if g.BlinkOn {
+		playercolor = colorLight
+	}
+	ebitenutil.DrawRect(screen, g.Player.X, g.Player.Y, 1, 1, playercolor)
 }
 
 // Layout is hardcoded for now, may be made dynamic in future
