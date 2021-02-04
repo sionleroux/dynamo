@@ -72,21 +72,25 @@ func (g *Game) Update() error {
 	if inpututil.IsKeyJustPressed(ebiten.KeyS) {
 		if g.Player.Y+1 <= float64(g.Height-1) {
 			g.Player.Y++
+			g.Player.TorchOn = false
 		}
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyW) {
 		if g.Player.Y-1 >= 0 {
 			g.Player.Y--
+			g.Player.TorchOn = false
 		}
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyA) {
 		if g.Player.X-1 >= 0 {
 			g.Player.X--
+			g.Player.TorchOn = false
 		}
 	}
 	if inpututil.IsKeyJustPressed(ebiten.KeyD) {
 		if g.Player.X+1 <= float64(g.Width-1) {
 			g.Player.X++
+			g.Player.TorchOn = false
 		}
 	}
 
