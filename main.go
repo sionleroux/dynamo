@@ -88,26 +88,26 @@ func (g *Game) Update() error {
 
 	// Movement controls
 	if inpututil.IsKeyJustPressed(ebiten.KeyS) {
-		if g.Player.Y+1 <= float64(g.Height-1) {
+		if g.Player.Y+1 <= g.Height-1 && g.Maze.At(g.Player.X, g.Player.Y+1) != nokiaPalette[0] {
 			g.Player.Y++
 			g.Player.TorchOn = false
 
 		}
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyW) {
+	if inpututil.IsKeyJustPressed(ebiten.KeyW) && g.Maze.At(g.Player.X, g.Player.Y-1) != nokiaPalette[0] {
 		if g.Player.Y-1 >= 0 {
 			g.Player.Y--
 			g.Player.TorchOn = false
 		}
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyA) {
+	if inpututil.IsKeyJustPressed(ebiten.KeyA) && g.Maze.At(g.Player.X-1, g.Player.Y) != nokiaPalette[0] {
 		if g.Player.X-1 >= 0 {
 			g.Player.X--
 			g.Player.TorchOn = false
 		}
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyD) {
-		if g.Player.X+1 <= float64(g.Width-1) {
+	if inpututil.IsKeyJustPressed(ebiten.KeyD) && g.Maze.At(g.Player.X+1, g.Player.Y) != nokiaPalette[0] {
+		if g.Player.X+1 <= g.Width-1 {
 			g.Player.X++
 			g.Player.TorchOn = false
 		}
@@ -134,7 +134,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	if g.BlinkOn || !g.Player.TorchOn {
 		playercolor = colorLight
 	}
-	ebitenutil.DrawRect(screen, g.Player.X, g.Player.Y, 1, 1, playercolor)
+	ebitenutil.DrawRect(screen, float64(g.Player.X), float64(g.Player.Y), 1, 1, playercolor)
 }
 
 // Layout is hardcoded for now, may be made dynamic in future
@@ -144,7 +144,7 @@ func (g *Game) Layout(outsideWidth int, outsideHeight int) (screenWidth int, scr
 
 // Player is the pixel the player controlers
 type Player struct {
-	X       float64
-	Y       float64
+	X       int
+	Y       int
 	TorchOn bool
 }
