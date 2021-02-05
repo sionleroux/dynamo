@@ -52,6 +52,7 @@ func main() {
 		Height:  gameHeight,
 		Player:  &Player{1, 1, true, false},
 		Maze:    mazeImage,
+		Exit:    exit,
 		BlinkOn: true,
 	}
 
@@ -84,6 +85,7 @@ type Game struct {
 	Height  int
 	Player  *Player
 	Maze    *ebiten.Image
+	Exit    image.Point
 	BlinkOn bool
 }
 
@@ -92,6 +94,10 @@ func (g *Game) Update() error {
 	// Pressing Esc any time quits immediately
 	if ebiten.IsKeyPressed(ebiten.KeyEscape) {
 		return errors.New("game quit by player")
+	}
+
+	if g.Player.X == g.Exit.X && g.Player.Y == g.Exit.Y {
+		return errors.New("you win")
 	}
 
 	// Movement controls
