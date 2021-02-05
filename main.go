@@ -30,9 +30,7 @@ func main() {
 	ebiten.SetWindowResizable(true)
 	gameWidth, gameHeight := 84, 48
 
-	source := rand.NewSource(1)
-	generator := maze.WithKruskal(source)
-	mymaze := generator.Generate(gameWidth/2-1, gameHeight/2-1)
+	mymaze := maze.WithKruskal(rand.NewSource(1)).Generate(gameWidth/2-1, gameHeight/2-1)
 	grayMaze := maze.Gray(mymaze)
 	colorMaze := image.NewPaletted(grayMaze.Bounds(), nokiaPalette)
 	for k, v := range grayMaze.Pix {
