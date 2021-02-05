@@ -40,12 +40,13 @@ func main() {
 	game := &Game{
 		Width:   gameWidth,
 		Height:  gameHeight,
-		Player:  &Player{1, 1, true},
+		Player:  &Player{1, 1, true, false},
 		Maze:    mazeImage,
 		BlinkOn: true,
 	}
 
 	blinker := time.NewTicker(500 * time.Millisecond)
+	mover := time.NewTicker(150 * time.Millisecond)
 
 	go func() {
 		for {
@@ -56,6 +57,8 @@ func main() {
 				} else {
 					game.BlinkOn = true
 				}
+			case <-mover.C:
+				game.Player.Moving = false
 			}
 		}
 	}()
@@ -82,29 +85,32 @@ func (g *Game) Update() error {
 	}
 
 	// Movement controls
-	if inpututil.IsKeyJustPressed(ebiten.KeyS) {
+	if ebiten.IsKeyPressed(ebiten.KeyS) && !g.Player.Moving {
 		g.Player.TorchOn = false
 		if g.Player.Y+1 <= g.Height-1 && g.Maze.At(g.Player.X, g.Player.Y+1) != nokiaPalette[0] {
 			g.Player.Y++
-
+			g.Player.Moving = true
 		}
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyW) {
+	if ebiten.IsKeyPressed(ebiten.KeyW) && !g.Player.Moving {
 		g.Player.TorchOn = false
 		if g.Player.Y-1 >= 0 && g.Maze.At(g.Player.X, g.Player.Y-1) != nokiaPalette[0] {
 			g.Player.Y--
+			g.Player.Moving = true
 		}
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyA) {
+	if ebiten.IsKeyPressed(ebiten.KeyA) && !g.Player.Moving {
 		g.Player.TorchOn = false
 		if g.Player.X-1 >= 0 && g.Maze.At(g.Player.X-1, g.Player.Y) != nokiaPalette[0] {
 			g.Player.X--
+			g.Player.Moving = true
 		}
 	}
-	if inpututil.IsKeyJustPressed(ebiten.KeyD) {
+	if ebiten.IsKeyPressed(ebiten.KeyD) && !g.Player.Moving {
 		g.Player.TorchOn = false
 		if g.Player.X+1 <= g.Width-1 && g.Maze.At(g.Player.X+1, g.Player.Y) != nokiaPalette[0] {
 			g.Player.X++
+			g.Player.Moving = true
 		}
 	}
 
@@ -142,4 +148,5 @@ type Player struct {
 	X       int
 	Y       int
 	TorchOn bool
+	Moving  bool
 }
