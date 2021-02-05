@@ -35,6 +35,16 @@ func main() {
 			colorMaze.Pix[k] = 1
 		}
 	}
+
+	var exit image.Point
+	for i := colorMaze.Rect.Max.X; i > 0; i-- {
+		if colorMaze.At(i, colorMaze.Rect.Max.Y-2) == colorLight {
+			exit = image.Pt(i, colorMaze.Rect.Max.Y)
+			colorMaze.Set(exit.X, exit.Y-1, colorLight)
+			break
+		}
+	}
+
 	mazeImage := ebiten.NewImageFromImage(colorMaze)
 
 	game := &Game{
