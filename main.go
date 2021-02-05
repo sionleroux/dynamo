@@ -17,10 +17,7 @@ import (
 var (
 	colorLight   color.Color   = color.RGBA{199, 240, 216, 255}
 	colorDark    color.Color   = color.RGBA{67, 82, 61, 255}
-	nokiaPalette color.Palette = color.Palette{
-		colorDark,
-		colorLight,
-	}
+	nokiaPalette color.Palette = color.Palette{colorDark, colorLight}
 )
 
 func main() {
