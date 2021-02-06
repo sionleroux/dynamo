@@ -49,13 +49,10 @@ func main() {
 		Source:  source,
 	}
 
-	blinker := time.NewTicker(500 * time.Millisecond)
 	go func() {
-		for {
-			select {
-			case <-blinker.C:
-				game.BlinkOn = !game.BlinkOn
-			}
+		blinker := time.NewTicker(500 * time.Millisecond)
+		for _ = range blinker.C {
+			game.BlinkOn = !game.BlinkOn
 		}
 	}()
 
