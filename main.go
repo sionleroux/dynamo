@@ -28,41 +28,19 @@ const (
 )
 
 func main() {
-	ebiten.SetWindowSize(840, 480)
+	gameSize := image.Pt(84, 48)
+	windowScale := 10
+	ebiten.SetWindowSize(gameSize.X*windowScale, gameSize.Y*windowScale)
 	ebiten.SetWindowTitle("Dynamo")
 	ebiten.SetCursorMode(ebiten.CursorModeHidden)
 	ebiten.SetWindowResizable(true)
-	gameWidth, gameHeight := 84, 48
 
-	levelScale := levelBeginner
-	mymaze := maze.WithKruskal(
-		rand.NewSource(int64(time.Now().Nanosecond())),
-	).Generate(gameWidth/levelScale-1, gameHeight/levelScale-1)
-	grayMaze := maze.Gray(mymaze)
-	colorMaze := image.NewPaletted(grayMaze.Bounds(), nokiaPalette)
-	for k, v := range grayMaze.Pix {
-		if v == 255 {
-			colorMaze.Pix[k] = 1
-		}
-	}
-
-	var exit image.Point
-	for i := colorMaze.Rect.Max.X; i > 0; i-- {
-		if colorMaze.At(i, colorMaze.Rect.Max.Y-2) == colorLight {
-			exit = image.Pt(i, colorMaze.Rect.Max.Y)
-			colorMaze.Set(exit.X, exit.Y-1, colorLight)
-			break
-		}
-	}
-
-	mazeImage := ebiten.NewImageFromImage(colorMaze)
+	source := rand.NewSource(int64(time.Now().Nanosecond()))
 
 	game := &Game{
-		Width:   gameWidth,
-		Height:  gameHeight,
+		Size:    gameSize,
 		Player:  &Player{image.Pt(1, 1), true, false},
-		Maze:    mazeImage,
-		Exit:    exit,
+		Maze:    NewMaze(source, levelBeginner, gameSize),
 		BlinkOn: true,
 	}
 
@@ -87,11 +65,9 @@ func main() {
 
 // Game tracks global game states
 type Game struct {
-	Width   int
-	Height  int
+	Size    image.Point
 	Player  *Player
-	Maze    *ebiten.Image
-	Exit    image.Point
+	Maze    *Maze
 	BlinkOn bool
 }
 
@@ -102,7 +78,7 @@ func (g *Game) Update() error {
 		return errors.New("game quit by player")
 	}
 
-	if g.Player.Coords.Eq(g.Exit) {
+	if g.Player.Coords.Eq(g.Maze.Exit) {
 		return errors.New("you win")
 	}
 
@@ -131,18 +107,24 @@ func (g *Game) Update() error {
 func (g *Game) Draw(screen *ebiten.Image) {
 	screen.Fill(colorDark)
 	if g.Player.TorchOn {
-		screen.DrawImage(g.Maze, &ebiten.DrawImageOptions{})
+		op := &ebiten.DrawImageOptions{}
+		op.GeoM.Translate(
+			float64(g.Maze.Offset.X),
+			float64(g.Maze.Offset.Y),
+		)
+		screen.DrawImage(g.Maze.Image, op)
 	}
 	playercolor := colorDark
 	if g.BlinkOn || !g.Player.TorchOn {
 		playercolor = colorLight
 	}
-	screen.Set(g.Player.Coords.X, g.Player.Coords.Y, playercolor)
+	playerPos := g.Player.Coords.Add(g.Maze.Offset)
+	screen.Set(playerPos.X, playerPos.Y, playercolor)
 }
 
 // Layout is hardcoded for now, may be made dynamic in future
 func (g *Game) Layout(outsideWidth int, outsideHeight int) (screenWidth int, screenHeight int) {
-	return g.Width, g.Height
+	return g.Size.X, g.Size.Y
 }
 
 // Player is the pixel the player controlers
@@ -152,15 +134,62 @@ type Player struct {
 	Moving  bool
 }
 
-func (p *Player) Move(maze *ebiten.Image, dest image.Point) {
+func (p *Player) Move(maze *Maze, dest image.Point) {
 	if p.Moving {
 		return
 	}
 
 	p.TorchOn = false
 	newCoords := p.Coords.Add(dest)
-	if maze.At(newCoords.X, newCoords.Y) != colorDark {
+	if maze.Image.At(newCoords.X, newCoords.Y) != colorDark {
 		p.Coords = newCoords
 		p.Moving = true
+	}
+}
+
+type Maze struct {
+	Image  *ebiten.Image
+	Maze   *maze.Maze
+	Exit   image.Point
+	Offset image.Point
+}
+
+func NewMaze(source rand.Source, levelScale int, gameSize image.Point) *Maze {
+	mymaze := maze.WithKruskal(source).Generate(
+		gameSize.X/levelScale-1,
+		gameSize.Y/levelScale-1,
+	)
+
+	// Convert to Nokia colours
+	grayMaze := maze.Gray(mymaze)
+	colorMaze := image.NewPaletted(grayMaze.Bounds(), nokiaPalette)
+	for k, v := range grayMaze.Pix {
+		if v == 255 {
+			colorMaze.Pix[k] = 1
+		}
+	}
+
+	// Find an exit at the bottom right
+	var exit image.Point
+	for i := colorMaze.Rect.Max.X; i > 0; i-- {
+		if colorMaze.At(i, colorMaze.Rect.Max.Y-2) == colorLight {
+			exit = image.Pt(i, colorMaze.Rect.Max.Y)
+			colorMaze.Set(exit.X, exit.Y-1, colorLight)
+			break
+		}
+	}
+
+	mazeImage := ebiten.NewImageFromImage(colorMaze)
+
+	offset := image.Pt(
+		(gameSize.X-mazeImage.Bounds().Dx())/2,
+		(gameSize.Y-mazeImage.Bounds().Dy())/2,
+	)
+
+	return &Maze{
+		Maze:   mymaze,
+		Image:  mazeImage,
+		Exit:   exit,
+		Offset: offset,
 	}
 }
