@@ -63,11 +63,7 @@ func main() {
 		for {
 			select {
 			case <-blinker.C:
-				if game.BlinkOn {
-					game.BlinkOn = false
-				} else {
-					game.BlinkOn = true
-				}
+				game.BlinkOn = !game.BlinkOn
 			case <-mover.C:
 				game.Player.Moving = false
 			}
