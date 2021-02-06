@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
 	"gitlab.com/zaba505/maze"
 )
@@ -113,6 +114,14 @@ func (g *Game) Draw(screen *ebiten.Image) {
 			float64(g.Maze.Offset.Y),
 		)
 		screen.DrawImage(g.Maze.Image, op)
+		ebitenutil.DrawLine(
+			screen,
+			float64(g.Maze.Exit.X+g.Maze.Offset.X+1),
+			float64(g.Maze.Exit.Y+g.Maze.Offset.Y),
+			float64(g.Maze.Exit.X+g.Maze.Offset.X+1),
+			float64(screen.Bounds().Max.Y),
+			colorLight,
+		)
 	}
 	playercolor := colorDark
 	if g.BlinkOn || !g.Player.TorchOn {
