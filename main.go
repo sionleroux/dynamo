@@ -43,6 +43,7 @@ func main() {
 		Player:  &Player{image.Pt(1, 1), true, false},
 		Maze:    NewMaze(source, levelBeginner, gameSize),
 		BlinkOn: true,
+		Win:     false,
 	}
 
 	blinker := time.NewTicker(500 * time.Millisecond)
@@ -70,6 +71,7 @@ type Game struct {
 	Player  *Player
 	Maze    *Maze
 	BlinkOn bool
+	Win     bool
 }
 
 // Update updates a game by one tick. The given argument represents a screen image.
@@ -80,7 +82,16 @@ func (g *Game) Update() error {
 	}
 
 	if g.Player.Coords.Eq(g.Maze.Exit) {
-		return errors.New("you win")
+		g.Win = true
+	}
+
+	if g.Win {
+		g.Player.Coords.Y++
+		if g.Player.Coords.Y > g.Size.Y {
+			g.Win = false
+			return errors.New("you win")
+		}
+		return nil
 	}
 
 	// Movement controls
