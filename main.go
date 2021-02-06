@@ -97,33 +97,17 @@ func (g *Game) Update() error {
 	}
 
 	// Movement controls
-	if ebiten.IsKeyPressed(ebiten.KeyS) && !g.Player.Moving {
-		g.Player.TorchOn = false
-		if g.Player.Coords.Y+1 <= g.Height-1 && g.Maze.At(g.Player.Coords.X, g.Player.Coords.Y+1) != nokiaPalette[0] {
-			g.Player.Coords.Y++
-			g.Player.Moving = true
-		}
+	if ebiten.IsKeyPressed(ebiten.KeyS) {
+		g.Player.Move(g.Maze, image.Pt(0, 1))
 	}
-	if ebiten.IsKeyPressed(ebiten.KeyW) && !g.Player.Moving {
-		g.Player.TorchOn = false
-		if g.Player.Coords.Y-1 >= 0 && g.Maze.At(g.Player.Coords.X, g.Player.Coords.Y-1) != nokiaPalette[0] {
-			g.Player.Coords.Y--
-			g.Player.Moving = true
-		}
+	if ebiten.IsKeyPressed(ebiten.KeyW) {
+		g.Player.Move(g.Maze, image.Pt(0, -1))
 	}
-	if ebiten.IsKeyPressed(ebiten.KeyA) && !g.Player.Moving {
-		g.Player.TorchOn = false
-		if g.Player.Coords.X-1 >= 0 && g.Maze.At(g.Player.Coords.X-1, g.Player.Coords.Y) != nokiaPalette[0] {
-			g.Player.Coords.X--
-			g.Player.Moving = true
-		}
+	if ebiten.IsKeyPressed(ebiten.KeyA) {
+		g.Player.Move(g.Maze, image.Pt(-1, 0))
 	}
-	if ebiten.IsKeyPressed(ebiten.KeyD) && !g.Player.Moving {
-		g.Player.TorchOn = false
-		if g.Player.Coords.X+1 <= g.Width-1 && g.Maze.At(g.Player.Coords.X+1, g.Player.Coords.Y) != nokiaPalette[0] {
-			g.Player.Coords.X++
-			g.Player.Moving = true
-		}
+	if ebiten.IsKeyPressed(ebiten.KeyD) {
+		g.Player.Move(g.Maze, image.Pt(1, 0))
 	}
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyE) {
@@ -156,4 +140,17 @@ type Player struct {
 	Coords  image.Point
 	TorchOn bool
 	Moving  bool
+}
+
+func (p *Player) Move(maze *ebiten.Image, dest image.Point) {
+	if p.Moving {
+		return
+	}
+
+	p.TorchOn = false
+	newCoords := p.Coords.Add(dest)
+	if maze.At(newCoords.X, newCoords.Y) != colorDark {
+		p.Coords = newCoords
+		p.Moving = true
+	}
 }
