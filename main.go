@@ -181,8 +181,9 @@ func (p *Player) Move(maze *Maze, dest image.Point, key ebiten.Key) {
 	if !p.Moved {
 		if inpututil.IsKeyJustPressed(key) {
 			p.Moved = true
+		} else {
+			return
 		}
-		return
 	}
 
 	p.TorchOn = false
