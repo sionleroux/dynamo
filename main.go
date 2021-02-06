@@ -18,14 +18,15 @@ var (
 	colorLight   color.Color   = color.RGBA{199, 240, 216, 255}
 	colorDark    color.Color   = color.RGBA{67, 82, 61, 255}
 	nokiaPalette color.Palette = color.Palette{colorDark, colorLight}
+	Levels       []int         = []int{10, 6, 4, 3, 2}
 )
 
 const (
-	levelBeginner = 10
-	levelEasy     = 6
-	levelMedium   = 4
-	levelHard     = 3
-	levelExtreme  = 2
+	LevelBeginner int = iota
+	LevelEasy
+	LevelMedium
+	LevelHard
+	LevelExtreme
 )
 
 func main() {
@@ -40,10 +41,12 @@ func main() {
 
 	game := &Game{
 		Size:    gameSize,
-		Player:  &Player{image.Pt(1, 1), true, false},
-		Maze:    NewMaze(source, levelBeginner, gameSize),
+		Player:  NewPlayer(),
+		Maze:    NewMaze(source, LevelBeginner, gameSize),
 		BlinkOn: true,
 		Win:     false,
+		Level:   LevelBeginner,
+		Source:  source,
 	}
 
 	blinker := time.NewTicker(500 * time.Millisecond)
@@ -72,6 +75,8 @@ type Game struct {
 	Maze    *Maze
 	BlinkOn bool
 	Win     bool
+	Level   int
+	Source  rand.Source
 }
 
 // Update updates a game by one tick. The given argument represents a screen image.
@@ -88,8 +93,7 @@ func (g *Game) Update() error {
 	if g.Win {
 		g.Player.Coords.Y++
 		if g.Player.Coords.Y > g.Size.Y {
-			g.Win = false
-			return errors.New("you win")
+			g.NextLevel()
 		}
 		return nil
 	}
@@ -147,11 +151,24 @@ func (g *Game) Layout(outsideWidth int, outsideHeight int) (screenWidth int, scr
 	return g.Size.X, g.Size.Y
 }
 
+func (g *Game) NextLevel() {
+	g.Win = false
+	g.Player = NewPlayer()
+	if g.Level <= LevelExtreme {
+		g.Level++
+	}
+	g.Maze = NewMaze(g.Source, g.Level, g.Size)
+}
+
 // Player is the pixel the player controlers
 type Player struct {
 	Coords  image.Point
 	TorchOn bool
 	Moving  bool
+}
+
+func NewPlayer() *Player {
+	return &Player{image.Pt(1, 1), true, false}
 }
 
 func (p *Player) Move(maze *Maze, dest image.Point) {
@@ -174,10 +191,10 @@ type Maze struct {
 	Offset image.Point
 }
 
-func NewMaze(source rand.Source, levelScale int, gameSize image.Point) *Maze {
+func NewMaze(source rand.Source, level int, gameSize image.Point) *Maze {
 	mymaze := maze.WithKruskal(source).Generate(
-		gameSize.X/levelScale-1,
-		gameSize.Y/levelScale-1,
+		gameSize.X/Levels[level]-1,
+		gameSize.Y/Levels[level]-1,
 	)
 
 	// Convert to Nokia colours
