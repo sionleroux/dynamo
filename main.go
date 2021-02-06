@@ -20,6 +20,14 @@ var (
 	nokiaPalette color.Palette = color.Palette{colorDark, colorLight}
 )
 
+const (
+	levelBeginner = 10
+	levelEasy     = 6
+	levelMedium   = 4
+	levelHard     = 3
+	levelExtreme  = 2
+)
+
 func main() {
 	ebiten.SetWindowSize(840, 480)
 	ebiten.SetWindowTitle("Dynamo")
@@ -27,9 +35,10 @@ func main() {
 	ebiten.SetWindowResizable(true)
 	gameWidth, gameHeight := 84, 48
 
+	levelScale := levelBeginner
 	mymaze := maze.WithKruskal(
 		rand.NewSource(int64(time.Now().Nanosecond())),
-	).Generate(gameWidth/2-1, gameHeight/2-1)
+	).Generate(gameWidth/levelScale-1, gameHeight/levelScale-1)
 	grayMaze := maze.Gray(mymaze)
 	colorMaze := image.NewPaletted(grayMaze.Bounds(), nokiaPalette)
 	for k, v := range grayMaze.Pix {
