@@ -50,7 +50,7 @@ func main() {
 	game := &Game{
 		Width:   gameWidth,
 		Height:  gameHeight,
-		Player:  &Player{1, 1, true, false},
+		Player:  &Player{image.Pt(1, 1), true, false},
 		Maze:    mazeImage,
 		Exit:    exit,
 		BlinkOn: true,
@@ -92,36 +92,36 @@ func (g *Game) Update() error {
 		return errors.New("game quit by player")
 	}
 
-	if g.Player.X == g.Exit.X && g.Player.Y == g.Exit.Y {
+	if g.Player.Coords.Eq(g.Exit) {
 		return errors.New("you win")
 	}
 
 	// Movement controls
 	if ebiten.IsKeyPressed(ebiten.KeyS) && !g.Player.Moving {
 		g.Player.TorchOn = false
-		if g.Player.Y+1 <= g.Height-1 && g.Maze.At(g.Player.X, g.Player.Y+1) != nokiaPalette[0] {
-			g.Player.Y++
+		if g.Player.Coords.Y+1 <= g.Height-1 && g.Maze.At(g.Player.Coords.X, g.Player.Coords.Y+1) != nokiaPalette[0] {
+			g.Player.Coords.Y++
 			g.Player.Moving = true
 		}
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyW) && !g.Player.Moving {
 		g.Player.TorchOn = false
-		if g.Player.Y-1 >= 0 && g.Maze.At(g.Player.X, g.Player.Y-1) != nokiaPalette[0] {
-			g.Player.Y--
+		if g.Player.Coords.Y-1 >= 0 && g.Maze.At(g.Player.Coords.X, g.Player.Coords.Y-1) != nokiaPalette[0] {
+			g.Player.Coords.Y--
 			g.Player.Moving = true
 		}
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyA) && !g.Player.Moving {
 		g.Player.TorchOn = false
-		if g.Player.X-1 >= 0 && g.Maze.At(g.Player.X-1, g.Player.Y) != nokiaPalette[0] {
-			g.Player.X--
+		if g.Player.Coords.X-1 >= 0 && g.Maze.At(g.Player.Coords.X-1, g.Player.Coords.Y) != nokiaPalette[0] {
+			g.Player.Coords.X--
 			g.Player.Moving = true
 		}
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyD) && !g.Player.Moving {
 		g.Player.TorchOn = false
-		if g.Player.X+1 <= g.Width-1 && g.Maze.At(g.Player.X+1, g.Player.Y) != nokiaPalette[0] {
-			g.Player.X++
+		if g.Player.Coords.X+1 <= g.Width-1 && g.Maze.At(g.Player.Coords.X+1, g.Player.Coords.Y) != nokiaPalette[0] {
+			g.Player.Coords.X++
 			g.Player.Moving = true
 		}
 	}
@@ -147,7 +147,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	if g.BlinkOn || !g.Player.TorchOn {
 		playercolor = colorLight
 	}
-	ebitenutil.DrawRect(screen, float64(g.Player.X), float64(g.Player.Y), 1, 1, playercolor)
+	ebitenutil.DrawRect(screen, float64(g.Player.Coords.X), float64(g.Player.Coords.Y), 1, 1, playercolor)
 }
 
 // Layout is hardcoded for now, may be made dynamic in future
@@ -157,8 +157,7 @@ func (g *Game) Layout(outsideWidth int, outsideHeight int) (screenWidth int, scr
 
 // Player is the pixel the player controlers
 type Player struct {
-	X       int
-	Y       int
+	Coords  image.Point
 	TorchOn bool
 	Moving  bool
 }
