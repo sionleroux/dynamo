@@ -162,6 +162,7 @@ type Player struct {
 	Coords  image.Point
 	TorchOn bool
 	Step    int
+	Moved   bool
 }
 
 func NewPlayer() *Player {
@@ -173,6 +174,14 @@ func NewPlayer() *Player {
 
 func (p *Player) Move(maze *Maze, dest image.Point, key ebiten.Key) {
 	if p.Step > 0 {
+		return
+	}
+
+	// Don't move if the key is still being held in from the last level
+	if !p.Moved {
+		if inpututil.IsKeyJustPressed(key) {
+			p.Moved = true
+		}
 		return
 	}
 
