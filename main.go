@@ -173,7 +173,7 @@ func NewPlayer() *Player {
 }
 
 func (p *Player) Move(maze *Maze, dest image.Point, key ebiten.Key) {
-	if p.Step > 0 {
+	if p.Step > 0 && !inpututil.IsKeyJustPressed(key) {
 		return
 	}
 
@@ -189,11 +189,10 @@ func (p *Player) Move(maze *Maze, dest image.Point, key ebiten.Key) {
 	newCoords := p.Coords.Add(dest)
 	if maze.Image.At(newCoords.X, newCoords.Y) != colorDark {
 		p.Coords = newCoords
-		p.Step = 5
+		p.Step = 2
 		if inpututil.IsKeyJustPressed(key) {
-			p.Step = 10
+			p.Step = 15
 		}
-
 	}
 }
 
