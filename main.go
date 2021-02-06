@@ -50,15 +50,11 @@ func main() {
 	}
 
 	blinker := time.NewTicker(500 * time.Millisecond)
-	mover := time.NewTicker(150 * time.Millisecond)
-
 	go func() {
 		for {
 			select {
 			case <-blinker.C:
 				game.BlinkOn = !game.BlinkOn
-			case <-mover.C:
-				game.Player.Moving = false
 			}
 		}
 	}()
@@ -100,20 +96,24 @@ func (g *Game) Update() error {
 
 	// Movement controls
 	if ebiten.IsKeyPressed(ebiten.KeyS) {
-		g.Player.Move(g.Maze, image.Pt(0, 1))
+		g.Player.Move(g.Maze, image.Pt(0, 1), ebiten.KeyS)
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyW) {
-		g.Player.Move(g.Maze, image.Pt(0, -1))
+		g.Player.Move(g.Maze, image.Pt(0, -1), ebiten.KeyW)
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyA) {
-		g.Player.Move(g.Maze, image.Pt(-1, 0))
+		g.Player.Move(g.Maze, image.Pt(-1, 0), ebiten.KeyA)
 	}
 	if ebiten.IsKeyPressed(ebiten.KeyD) {
-		g.Player.Move(g.Maze, image.Pt(1, 0))
+		g.Player.Move(g.Maze, image.Pt(1, 0), ebiten.KeyD)
 	}
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyE) {
 		g.Player.TorchOn = !g.Player.TorchOn
+	}
+
+	if g.Player.Step > 0 {
+		g.Player.Step--
 	}
 
 	return nil
@@ -164,15 +164,18 @@ func (g *Game) NextLevel() {
 type Player struct {
 	Coords  image.Point
 	TorchOn bool
-	Moving  bool
+	Step    int
 }
 
 func NewPlayer() *Player {
-	return &Player{image.Pt(1, 1), true, false}
+	return &Player{
+		Coords:  image.Pt(1, 1),
+		TorchOn: true,
+	}
 }
 
-func (p *Player) Move(maze *Maze, dest image.Point) {
-	if p.Moving {
+func (p *Player) Move(maze *Maze, dest image.Point, key ebiten.Key) {
+	if p.Step > 0 {
 		return
 	}
 
@@ -180,7 +183,11 @@ func (p *Player) Move(maze *Maze, dest image.Point) {
 	newCoords := p.Coords.Add(dest)
 	if maze.Image.At(newCoords.X, newCoords.Y) != colorDark {
 		p.Coords = newCoords
-		p.Moving = true
+		p.Step = 5
+		if inpututil.IsKeyJustPressed(key) {
+			p.Step = 10
+		}
+
 	}
 }
 
