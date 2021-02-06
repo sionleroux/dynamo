@@ -127,11 +127,7 @@ func (g *Game) Update() error {
 	}
 
 	if inpututil.IsKeyJustPressed(ebiten.KeyE) {
-		if g.Player.TorchOn {
-			g.Player.TorchOn = false
-		} else {
-			g.Player.TorchOn = true
-		}
+		g.Player.TorchOn = !g.Player.TorchOn
 	}
 
 	return nil
