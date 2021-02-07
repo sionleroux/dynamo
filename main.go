@@ -78,6 +78,10 @@ type Game struct {
 
 // Update updates a game by one tick.
 func (g *Game) Update() error {
+	return updateLevel(g)
+}
+
+func updateLevel(g *Game) error {
 	// Pressing Esc any time quits immediately
 	if ebiten.IsKeyPressed(ebiten.KeyEscape) {
 		return errors.New("game quit by player")
@@ -122,6 +126,10 @@ func (g *Game) Update() error {
 
 // Draw draws the game screen by one frame
 func (g *Game) Draw(screen *ebiten.Image) {
+	drawLevel(g, screen)
+}
+
+func drawLevel(g *Game, screen *ebiten.Image) {
 	screen.Fill(ColorDark)
 	if g.Player.TorchOn {
 		op := &ebiten.DrawImageOptions{}
