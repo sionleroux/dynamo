@@ -11,6 +11,7 @@ import (
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"github.com/sinisterstuf/dynamo/media"
 )
 
 var (
@@ -53,6 +54,12 @@ func main() {
 
 	source := rand.NewSource(int64(time.Now().Nanosecond()))
 
+	title := image.NewPaletted(
+		image.Rectangle{image.Point{}, gameSize},
+		NokiaPalette,
+	)
+	title.Pix = media.Title
+
 	game := &Game{
 		Size:    gameSize,
 		Player:  NewPlayer(),
@@ -61,6 +68,7 @@ func main() {
 		Win:     false,
 		Level:   LevelBeginner,
 		Source:  source,
+		Title:   ebiten.NewImageFromImage(title),
 	}
 
 	go func() {
@@ -85,6 +93,7 @@ type Game struct {
 	Level   int
 	Source  rand.Source
 	State   State
+	Title   *ebiten.Image
 }
 
 // Update updates a game by one tick.
@@ -147,7 +156,7 @@ func updateLevel(g *Game) error {
 func (g *Game) Draw(screen *ebiten.Image) {
 	switch g.State {
 	case StateTitle:
-		ebitenutil.DebugPrint(screen, "Press E")
+		screen.DrawImage(g.Title, &ebiten.DrawImageOptions{})
 	case StateLevel:
 		drawLevel(g, screen)
 	}
