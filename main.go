@@ -33,6 +33,16 @@ const (
 	LevelExtreme
 )
 
+// State is a high-level game state controlling app behaviour
+type State int
+
+// States represent different overall states the game can be in
+const (
+	StateTitle State = iota
+	StateMenu
+	StateLevel
+)
+
 func main() {
 	gameSize := image.Pt(84, 48)
 	windowScale := 10
@@ -74,11 +84,20 @@ type Game struct {
 	Win     bool
 	Level   int
 	Source  rand.Source
+	State   State
 }
 
 // Update updates a game by one tick.
 func (g *Game) Update() error {
-	return updateLevel(g)
+	switch g.State {
+	case StateTitle:
+		if inpututil.IsKeyJustPressed(ebiten.KeyE) {
+			g.State = StateLevel
+		}
+	case StateLevel:
+		return updateLevel(g)
+	}
+	return nil
 }
 
 func updateLevel(g *Game) error {
@@ -126,7 +145,12 @@ func updateLevel(g *Game) error {
 
 // Draw draws the game screen by one frame
 func (g *Game) Draw(screen *ebiten.Image) {
-	drawLevel(g, screen)
+	switch g.State {
+	case StateTitle:
+		ebitenutil.DebugPrint(screen, "Press E")
+	case StateLevel:
+		drawLevel(g, screen)
+	}
 }
 
 func drawLevel(g *Game, screen *ebiten.Image) {
