@@ -110,8 +110,8 @@ func (g *Game) Update() error {
 }
 
 func updateLevel(g *Game) error {
-	// Pressing Esc any time quits immediately
-	if ebiten.IsKeyPressed(ebiten.KeyEscape) {
+	// Pressing Q quits immediately
+	if ebiten.IsKeyPressed(ebiten.KeyQ) {
 		return errors.New("game quit by player")
 	}
 
