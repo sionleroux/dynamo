@@ -70,3 +70,68 @@ func NewTitleFrames() *Animation {
 		Delay:  10,
 	}
 }
+
+// NewTitleTransitionFrames generates an animation of title frames
+func NewTitleTransitionFrames() *Animation {
+	frames := make([]*ebiten.Image, 45)
+
+	for k, v := range [][]uint8{
+		Title_pressed_01,
+		Title_pressed_02,
+		Title_pressed_03,
+		Title_pressed_04,
+		Title_pressed_05,
+		Title_pressed_06,
+		Title_pressed_07,
+		Title_pressed_08,
+		Title_pressed_09,
+		Title_pressed_10,
+		Title_pressed_11,
+		Title_pressed_12,
+		Title_pressed_13,
+		Title_pressed_14,
+		Title_pressed_15,
+		Title_pressed_16,
+		Title_pressed_17,
+		Title_pressed_18,
+		Title_pressed_19,
+		Title_pressed_20,
+		Title_pressed_21,
+		Title_pressed_22,
+		Title_pressed_23,
+		Title_pressed_24,
+		Title_pressed_25,
+		Title_pressed_26,
+		Title_pressed_27,
+		Title_pressed_28,
+		Title_pressed_29,
+		Title_pressed_30,
+		Title_pressed_31,
+		Title_pressed_32,
+		Title_pressed_33,
+		Title_pressed_34,
+		Title_pressed_35,
+		Title_pressed_36,
+		Title_pressed_37,
+		Title_pressed_38,
+		Title_pressed_39,
+		Title_pressed_40,
+		Title_pressed_41,
+		Title_pressed_42,
+		Title_pressed_43,
+		Title_pressed_44,
+		Title_pressed_45,
+	} {
+		frame := image.NewPaletted(
+			image.Rectangle{image.Point{}, GameSize},
+			NokiaPalette,
+		)
+		frame.Pix = v
+		frames[k] = ebiten.NewImageFromImage(frame)
+	}
+
+	return &Animation{
+		Frames: frames,
+		Delay:  1,
+	}
+}

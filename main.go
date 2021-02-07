@@ -31,6 +31,7 @@ type State int
 // States represent different overall states the game can be in
 const (
 	StateTitle State = iota
+	StateTitleTransition
 	StateMenu
 	StateLevel
 )
@@ -54,6 +55,7 @@ func main() {
 		Level:   LevelBeginner,
 		Source:  source,
 		Title:   media.NewTitleFrames(),
+		TT:      media.NewTitleTransitionFrames(),
 	}
 
 	go func() {
@@ -79,6 +81,7 @@ type Game struct {
 	Source  rand.Source
 	State   State
 	Title   *media.Animation
+	TT      *media.Animation
 }
 
 // Update updates a game by one tick.
@@ -87,6 +90,11 @@ func (g *Game) Update() error {
 	case StateTitle:
 		g.Title.Update()
 		if inpututil.IsKeyJustPressed(ebiten.KeyE) {
+			g.State = StateTitleTransition
+		}
+	case StateTitleTransition:
+		g.TT.Update()
+		if g.TT.Index == 0 {
 			g.State = StateLevel
 		}
 	case StateLevel:
@@ -143,6 +151,8 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	switch g.State {
 	case StateTitle:
 		screen.DrawImage(g.Title.CurrentFrame(), &ebiten.DrawImageOptions{})
+	case StateTitleTransition:
+		screen.DrawImage(g.TT.CurrentFrame(), &ebiten.DrawImageOptions{})
 	case StateLevel:
 		drawLevel(g, screen)
 	}
