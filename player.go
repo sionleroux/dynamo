@@ -5,6 +5,7 @@ import (
 
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
+	"github.com/sinisterstuf/dynamo/media"
 )
 
 // Player is the pixel the player controls
@@ -48,7 +49,7 @@ func (p *Player) Move(maze *Maze, dest image.Point, key ebiten.Key) {
 
 	// Do the actual move if legal
 	newCoords := p.Coords.Add(dest)
-	if maze.Image.At(newCoords.X, newCoords.Y) != ColorDark {
+	if maze.Image.At(newCoords.X, newCoords.Y) != media.ColorDark {
 		p.Coords = newCoords
 		p.Step = 2 // short cooldown when holding down
 		if inpututil.IsKeyJustPressed(key) {

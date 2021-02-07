@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"image"
-	"image/color"
 	"log"
 	"math/rand"
 	"time"
@@ -14,16 +13,8 @@ import (
 	"github.com/sinisterstuf/dynamo/media"
 )
 
-var (
-	// ColorLight is the ON or 1 screen colour, similar to white
-	ColorLight color.Color = color.RGBA{199, 240, 216, 255}
-	// ColorDark is the OFF or 0 screen colour, similar to black
-	ColorDark color.Color = color.RGBA{67, 82, 61, 255}
-	// NokiaPalette is a 1-bit palette of greenish colours simulating Nokia 3310
-	NokiaPalette color.Palette = color.Palette{ColorDark, ColorLight}
-	// Levels maps level difficulty indices to maze size scaling factors
-	Levels []int = []int{10, 6, 4, 3, 2}
-)
+// Levels maps level difficulty indices to maze size scaling factors
+var Levels []int = []int{10, 6, 4, 3, 2}
 
 // Levels represent the difficulty of different game levels
 const (
@@ -45,7 +36,7 @@ const (
 )
 
 func main() {
-	gameSize := image.Pt(84, 48)
+	gameSize := media.GameSize
 	windowScale := 10
 	ebiten.SetWindowSize(gameSize.X*windowScale, gameSize.Y*windowScale)
 	ebiten.SetWindowTitle("Dynamo")
@@ -53,12 +44,6 @@ func main() {
 	ebiten.SetWindowResizable(true)
 
 	source := rand.NewSource(int64(time.Now().Nanosecond()))
-
-	title := image.NewPaletted(
-		image.Rectangle{image.Point{}, gameSize},
-		NokiaPalette,
-	)
-	title.Pix = media.Title
 
 	game := &Game{
 		Size:    gameSize,
@@ -68,7 +53,7 @@ func main() {
 		Win:     false,
 		Level:   LevelBeginner,
 		Source:  source,
-		Title:   ebiten.NewImageFromImage(title),
+		Title:   media.NewTitleFrames(),
 	}
 
 	go func() {
@@ -93,13 +78,14 @@ type Game struct {
 	Level   int
 	Source  rand.Source
 	State   State
-	Title   *ebiten.Image
+	Title   *media.Animation
 }
 
 // Update updates a game by one tick.
 func (g *Game) Update() error {
 	switch g.State {
 	case StateTitle:
+		g.Title.Update()
 		if inpututil.IsKeyJustPressed(ebiten.KeyE) {
 			g.State = StateLevel
 		}
@@ -156,20 +142,22 @@ func updateLevel(g *Game) error {
 func (g *Game) Draw(screen *ebiten.Image) {
 	switch g.State {
 	case StateTitle:
-		screen.DrawImage(g.Title, &ebiten.DrawImageOptions{})
+		screen.DrawImage(g.Title.CurrentFrame(), &ebiten.DrawImageOptions{})
 	case StateLevel:
 		drawLevel(g, screen)
 	}
 }
 
 func drawLevel(g *Game, screen *ebiten.Image) {
-	screen.Fill(ColorDark)
+	screen.Fill(media.ColorDark)
 	if g.Player.TorchOn {
 		op := &ebiten.DrawImageOptions{}
 		op.GeoM.Translate(
 			float64(g.Maze.Offset.X),
 			float64(g.Maze.Offset.Y),
 		)
+		// torchLight := image.NewPaletted(g.Maze.Image.Bounds(), media.NokiaPalette)
+
 		screen.DrawImage(g.Maze.Image, op)
 		ebitenutil.DrawLine(
 			screen,
@@ -177,12 +165,12 @@ func drawLevel(g *Game, screen *ebiten.Image) {
 			float64(g.Maze.Exit.Y+g.Maze.Offset.Y),
 			float64(g.Maze.Exit.X+g.Maze.Offset.X+1),
 			float64(screen.Bounds().Max.Y),
-			ColorLight,
+			media.ColorLight,
 		)
 	}
-	playercolor := ColorDark
+	playercolor := media.ColorDark
 	if g.BlinkOn || !g.Player.TorchOn {
-		playercolor = ColorLight
+		playercolor = media.ColorLight
 	}
 	playerPos := g.Player.Coords.Add(g.Maze.Offset)
 	screen.Set(playerPos.X, playerPos.Y, playercolor)

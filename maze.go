@@ -5,6 +5,7 @@ import (
 	"math/rand"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/sinisterstuf/dynamo/media"
 	"gitlab.com/zaba505/maze"
 )
 
@@ -27,7 +28,7 @@ func NewMaze(source rand.Source, level int, gameSize image.Point) *Maze {
 
 	// Convert to Nokia colours
 	grayMaze := maze.Gray(mymaze)
-	colorMaze := image.NewPaletted(grayMaze.Bounds(), NokiaPalette)
+	colorMaze := image.NewPaletted(grayMaze.Bounds(), media.NokiaPalette)
 	for k, v := range grayMaze.Pix {
 		if v == 255 {
 			colorMaze.Pix[k] = 1
@@ -37,9 +38,9 @@ func NewMaze(source rand.Source, level int, gameSize image.Point) *Maze {
 	// Find an exit at the bottom right
 	var exit image.Point
 	for i := colorMaze.Rect.Max.X; i > 0; i-- {
-		if colorMaze.At(i, colorMaze.Rect.Max.Y-2) == ColorLight {
+		if colorMaze.At(i, colorMaze.Rect.Max.Y-2) == media.ColorLight {
 			exit = image.Pt(i, colorMaze.Rect.Max.Y)
-			colorMaze.Set(exit.X, exit.Y-1, ColorLight)
+			colorMaze.Set(exit.X, exit.Y-1, media.ColorLight)
 			break
 		}
 	}
