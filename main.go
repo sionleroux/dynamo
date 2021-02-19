@@ -197,7 +197,7 @@ func (g *Game) Layout(outsideWidth int, outsideHeight int) (screenWidth int, scr
 func (g *Game) NextLevel() {
 	g.Win = false
 	g.Player = NewPlayer()
-	if g.Level <= LevelExtreme {
+	if g.Level < LevelExtreme {
 		g.Level++
 	}
 	g.Maze = NewMaze(g.Source, g.Level, g.Size)
