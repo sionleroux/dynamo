@@ -1,21 +1,20 @@
 module github.com/sinisterstuf/dynamo
 
-go 1.21
+go 1.23
 
 require (
-	github.com/hajimehoshi/ebiten/v2 v2.5.9
+	github.com/hajimehoshi/ebiten/v2 v2.8.1
 	gitlab.com/zaba505/maze v0.0.5
 )
 
 require (
-	github.com/ebitengine/purego v0.4.0 // indirect
-	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20221017161538-93cebf72946b // indirect
-	github.com/jezek/xgb v1.1.0 // indirect
-	golang.org/x/exp v0.0.0-20230713183714-613f0c0eb8a1 // indirect
-	golang.org/x/exp/shiny v0.0.0-20230713183714-613f0c0eb8a1 // indirect
-	golang.org/x/image v0.10.0 // indirect
-	golang.org/x/mobile v0.0.0-20230531173138-3c911d8e3eda // indirect
-	golang.org/x/sync v0.3.0 // indirect
-	golang.org/x/sys v0.10.0 // indirect
-	gonum.org/v1/gonum v0.13.0 // indirect
+	github.com/ebitengine/gomobile v0.0.0-20241001034212-22433622d8a5 // indirect
+	github.com/ebitengine/hideconsole v1.0.0 // indirect
+	github.com/ebitengine/purego v0.8.0 // indirect
+	github.com/jezek/xgb v1.1.1 // indirect
+	golang.org/x/exp v0.0.0-20241004190924-225e2abe05e6 // indirect
+	golang.org/x/image v0.21.0 // indirect
+	golang.org/x/sync v0.8.0 // indirect
+	golang.org/x/sys v0.26.0 // indirect
+	gonum.org/v1/gonum v0.15.1 // indirect
 )
